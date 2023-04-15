@@ -1,5 +1,5 @@
 import customtkinter
-import database
+from data import database
 from widgets import SearchFrame, ButtonListFrame
 
 
