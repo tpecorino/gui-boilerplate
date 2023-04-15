@@ -3,7 +3,7 @@ from sqlalchemy.orm import declarative_base
 from sqlalchemy.orm import sessionmaker
 
 Base = declarative_base()
-SQLALCHEMY_DATABASE_URL = "sqlite:///./db.sqlite"
+SQLALCHEMY_DATABASE_URL = "sqlite:///./data/db.sqlite"
 TABLE_NAME = "characters"
 
 
