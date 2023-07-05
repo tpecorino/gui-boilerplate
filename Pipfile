@@ -8,6 +8,7 @@ customtkinter = "*"
 websocket-client = "*"
 sqlalchemy = "*"
 python-dotenv = "*"
+matplotlib = "*"
 
 [dev-packages]
 flake8 = "*"
