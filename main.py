@@ -46,6 +46,10 @@ class App(customtkinter.CTk):
                                                              command=self.handle_save)
         self.graph_form_submit_btn.grid(row=3, column=0, padx=10, pady=5, sticky="new")
 
+        self.graph_form_submit_btn = customtkinter.CTkButton(self.graph_form_frame, text="Clear",
+                                                             command=self.clear_form)
+        self.graph_form_submit_btn.grid(row=3, column=1, padx=10, pady=5, sticky="new")
+
         self.button_list = ButtonListFrame(self.graph_list_frame, gen_command=self.generate_graph,
                                            edit_command=self.edit_graph,
                                            delete_command=self.delete_graph)
@@ -68,7 +72,7 @@ class App(customtkinter.CTk):
         x_label = graph.x_axis_label
         y_label = graph.y_axis_label
         x_values = graph.x_axis_values.split()
-        y_values = graph.y_axis_values.split()
+        y_values = list(map(int, graph.y_axis_values.split()))
         graph_generator.generate_line_graph(x_label, y_label, x_values, y_values)
 
         print(f"Generate: {graph}")
@@ -112,11 +116,14 @@ class App(customtkinter.CTk):
         result = database.save_graph(self.session, graph)
         print('result', result)
         self.graphs.append(graph)
+        self.clear_form()
+        self.update_view = True
+        self.update_graph_list(result)
+
+    def clear_form(self):
         for widget in filter(lambda w: isinstance(w, customtkinter.CTkEntry),
                              self.graph_form_frame.children.values()):
             widget.delete(0, customtkinter.END)
-        self.update_view = True
-        self.update_graph_list(result)
 
 
 if __name__ == "__main__":
