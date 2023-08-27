@@ -14,6 +14,10 @@ class ButtonListFrame(customtkinter.CTkFrame):
         self.grid_columnconfigure(1, weight=1)
         self.grid_rowconfigure((0, 1), weight=1)
 
+    def update_item(self, graph):
+        label_attr_name = f"item_{graph['id']}_label"
+        getattr(self, label_attr_name).configure(text=graph['title'])
+
     def add_item(self, item):
         label_attr_name = f"item_{item.id}_label"
         gen_button_attr_name = f"gen_{item.id}_button"
