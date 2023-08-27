@@ -53,6 +53,7 @@ def fetch_entity_by_id(db, pk):
 def update_graph(db, pk, updated_character):
     db.query(Graph).filter(Graph.id == pk).update(updated_character)
     db.commit()
+    return updated_character
 
 
 def save_graph(db, graph):

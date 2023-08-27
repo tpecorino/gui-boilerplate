@@ -30,6 +30,9 @@ class App(customtkinter.CTk):
         self.graph_title_entry = customtkinter.CTkEntry(self.graph_form_frame, placeholder_text="Title")
         self.graph_title_entry.grid(row=0, column=0, columnspan=2, padx=10, pady=5, sticky="new")
 
+        self.graph_id_entry = customtkinter.CTkEntry(self.graph_form_frame)
+        self.graph_id_entry.grid_forget()
+
         self.x_axis_label_entry = customtkinter.CTkEntry(self.graph_form_frame, placeholder_text="X Axis Label")
         self.x_axis_label_entry.grid(row=1, column=0, columnspan=2, padx=10, pady=5, sticky="nw")
 
@@ -66,6 +69,7 @@ class App(customtkinter.CTk):
         self.graphs = database.fetch_graphs(self.session)
 
         for graph in self.graphs:
+            print('load', graph)
             self.button_list.add_item(graph)
 
     def generate_graph(self, graph):
@@ -77,29 +81,32 @@ class App(customtkinter.CTk):
 
         print(f"Generate: {graph}")
 
-    def edit_graph(self, item):
-        for widget in filter(lambda w: isinstance(w, customtkinter.CTkEntry),
-                             self.graph_form_frame.children.values()):
-            widget.delete(0, customtkinter.END)
-        self.graph_title_entry.insert(customtkinter.END, item.title)
-        self.x_axis_label_entry.insert(customtkinter.END, item.x_axis_label)
-        self.y_axis_label_entry.insert(customtkinter.END, item.y_axis_label)
-        self.x_axis_values_entry.insert(customtkinter.END, item.x_axis_values)
-        self.y_axis_values_entry.insert(customtkinter.END, item.y_axis_values)
-        print(f"Edit: {item}")
+    def update_graph_list(self, graph):
+        print('update_graph_list', graph)
+        if self.update_view:
+            self.button_list.update_item(graph)
+            self.update_view = False
 
     def delete_graph(self, graph):
         database.delete_graph(self.session, graph.id)
         self.button_list.remove_item(graph)
         print(f"Delete: {graph}")
 
-    def update_graph_list(self, graph):
-        if self.update_view:
-            self.button_list.add_item(graph)
-            self.update_view = False
+    def edit_graph(self, graph):
+        for widget in filter(lambda w: isinstance(w, customtkinter.CTkEntry),
+                             self.graph_form_frame.children.values()):
+            widget.delete(0, customtkinter.END)
+        self.graph_id_entry.insert(customtkinter.END, graph.id)
+        self.graph_title_entry.insert(customtkinter.END, graph.title)
+        self.x_axis_label_entry.insert(customtkinter.END, graph.x_axis_label)
+        self.y_axis_label_entry.insert(customtkinter.END, graph.y_axis_label)
+        self.x_axis_values_entry.insert(customtkinter.END, graph.x_axis_values)
+        self.y_axis_values_entry.insert(customtkinter.END, graph.y_axis_values)
+        print(f"Edit: {graph}")
 
     def handle_save(self, event=0):
         title = self.graph_title_entry.get()
+        graph_id = self.graph_id_entry.get()
         x_axis_label = self.x_axis_label_entry.get()
         y_axis_label = self.y_axis_label_entry.get()
         x_axis_values = self.x_axis_values_entry.get()
@@ -113,7 +120,12 @@ class App(customtkinter.CTk):
             "y_axis_values": y_axis_values
         }
 
-        result = database.save_graph(self.session, graph)
+        if graph_id != "":
+            graph['id'] = graph_id
+
+        result = database.save_graph(self.session, graph) if graph_id == "" else database.update_graph(self.session,
+                                                                                                       graph_id,
+                                                                                                       graph)
         print('result', result)
         self.graphs.append(graph)
         self.clear_form()
